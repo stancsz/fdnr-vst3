@@ -1,0 +1,4 @@
+build/
+JuceLibraryCode/
+*.jucer
+*.user
