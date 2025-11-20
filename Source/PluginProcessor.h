@@ -56,27 +56,27 @@ private:
     // Mode Enum
     enum Mode
     {
-        Gemini = 0,
-        Hydra,
-        Centaurus,
-        Sagittarius,
-        GreatAnnihilator,
-        Andromeda,
-        Lyra,
-        Capricorn,
-        LargeMagellanicCloud,
-        Triangulum,
-        CirrusMajor,
-        CirrusMinor,
-        Cassiopeia,
-        Orion,
-        Aquarius,
-        Pisces,
-        Scorpio,
-        Libra,
-        Leo,
-        Virgo,
-        Pleiades
+        TwinStar = 0,        // Gemini
+        SeaSerpent,          // Hydra
+        HorseMan,            // Centaurus
+        Archer,              // Sagittarius
+        VoidMaker,           // Great Annihilator
+        GalaxySpiral,        // Andromeda
+        HarpString,          // Lyra
+        GoatHorn,            // Capricorn
+        NebulaCloud,         // Large Magellanic Cloud
+        Triangle,            // Triangulum
+        CloudMajor,          // Cirrus Major
+        CloudMinor,          // Cirrus Minor
+        QueenChair,          // Cassiopeia
+        HunterBelt,          // Orion
+        WaterBearer,         // Aquarius
+        TwoFish,             // Pisces
+        ScorpionTail,        // Scorpio
+        BalanceScale,        // Libra
+        LionHeart,           // Leo
+        Maiden,              // Virgo
+        SevenSisters         // Pleiades
     };
 
     //==============================================================================

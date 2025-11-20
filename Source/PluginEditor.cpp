@@ -61,7 +61,7 @@ void VST3OpenValhallaAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (24.0f);
-    g.drawFittedText ("ValhallaSupermassive Clone", getLocalBounds().removeFromTop(40), juce::Justification::left, 1);
+    g.drawFittedText ("VST3 Open Valhalla", getLocalBounds().removeFromTop(40), juce::Justification::left, 1);
 
     // Draw Group Boxes
     g.setColour (juce::Colour(0xFF202040));

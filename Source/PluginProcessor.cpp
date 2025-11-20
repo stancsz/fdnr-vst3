@@ -63,27 +63,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout VST3OpenValhallaAudioProcess
 
     // Mode
     juce::StringArray modes;
-    modes.add("Gemini");
-    modes.add("Hydra");
-    modes.add("Centaurus");
-    modes.add("Sagittarius");
-    modes.add("Great Annihilator");
-    modes.add("Andromeda");
-    modes.add("Lyra");
-    modes.add("Capricorn");
-    modes.add("Large Magellanic Cloud");
-    modes.add("Triangulum");
-    modes.add("Cirrus Major");
-    modes.add("Cirrus Minor");
-    modes.add("Cassiopeia");
-    modes.add("Orion");
-    modes.add("Aquarius");
-    modes.add("Pisces");
-    modes.add("Scorpio");
-    modes.add("Libra");
-    modes.add("Leo");
-    modes.add("Virgo");
-    modes.add("Pleiades");
+    modes.add("Twin Star");         // Gemini
+    modes.add("Sea Serpent");       // Hydra
+    modes.add("Horse Man");         // Centaurus
+    modes.add("Archer");            // Sagittarius
+    modes.add("Void Maker");        // Great Annihilator
+    modes.add("Galaxy Spiral");     // Andromeda
+    modes.add("Harp String");       // Lyra
+    modes.add("Goat Horn");         // Capricorn
+    modes.add("Nebula Cloud");      // Large Magellanic Cloud
+    modes.add("Triangle");          // Triangulum
+    modes.add("Cloud Major");       // Cirrus Major
+    modes.add("Cloud Minor");       // Cirrus Minor
+    modes.add("Queen Chair");       // Cassiopeia
+    modes.add("Hunter Belt");       // Orion
+    modes.add("Water Bearer");      // Aquarius
+    modes.add("Two Fish");          // Pisces
+    modes.add("Scorpion Tail");     // Scorpio
+    modes.add("Balance Scale");     // Libra
+    modes.add("Lion Heart");        // Leo
+    modes.add("Maiden");            // Virgo
+    modes.add("Seven Sisters");     // Pleiades
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(
         "MODE", "Mode", modes, 0));
