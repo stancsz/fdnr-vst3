@@ -140,22 +140,91 @@ void ReverbProcessor::process(juce::dsp::ProcessContextReplacing<float>& context
              reverbParams.damping = 0.1f; // Long sustain
              break;
 
-        case 5: // Andromeda: Slowest attack, very long decay
+        case 5: // Galaxy Spiral (Andromeda)
              reverbParams.roomSize = 0.98f;
              chorus.setRate(0.2f); // Slow modulation
              break;
 
-        case 8: // Large Magellanic Cloud: Long reverb, repeating echoes
+        case 6: // Harp String (Lyra) - Fast attack, short decay
+             reverbParams.roomSize = baseRoomSize * 0.6f;
+             reverbParams.damping = baseDamping * 0.6f;
+             break;
+
+        case 7: // Goat Horn (Capricorn) - Medium density
+             reverbParams.roomSize = baseRoomSize * 0.75f;
+             reverbParams.width = baseWidth * 0.8f;
+             break;
+
+        case 8: // Nebula Cloud (LMC)
              reverbParams.roomSize = 0.9f;
              // Emphasize delay
              delayLine.setDelay(currentDelay * sampleRate / 1000.0f * 1.5f); // Longer delay
              break;
 
-        case 14: // Aquarius: EchoVerb
+        case 9: // Triangle (Triangulum) - Long reverb, very long echoes
+             reverbParams.roomSize = 0.92f;
+             delayLine.setDelay(currentDelay * sampleRate / 1000.0f * 2.0f); // Very long echoes
+             break;
+
+        case 10: // Cloud Major - Low density, strange patterns
+             reverbParams.roomSize = baseRoomSize * 0.8f;
+             reverbParams.damping = 0.2f; // Strange filter
+             chorus.setFeedback(0.7f); // High feedback for patterns
+             break;
+
+        case 11: // Cloud Minor - Smaller than Major
+             reverbParams.roomSize = baseRoomSize * 0.6f;
+             reverbParams.damping = 0.2f;
+             chorus.setFeedback(0.6f);
+             break;
+
+        case 12: // Queen Chair (Cassiopeia) - Low density builds to long
+             reverbParams.roomSize = 0.95f; // Long
+             reverbParams.damping = 0.8f; // Starts dark
+             // We can't simulate "build up" easily without more state, but we set high room size
+             break;
+
+        case 13: // Hunter Belt (Orion) - Bigger Cassiopeia
+             reverbParams.roomSize = 0.99f; // Massive
+             chorus.setDepth(0.9f); // Resonances
+             break;
+
+        case 14: // Water Bearer (Aquarius): EchoVerb
              reverbParams.roomSize = baseRoomSize * 0.4f; // Smaller reverb
              reverbParams.wetLevel = 0.5f; // Less reverb, more delay
-             // We need to boost the delay signal relative to reverb?
-             // In this simple chain, they are serial.
+             break;
+
+        case 15: // Two Fish (Pisces) - Bigger EchoVerb
+             reverbParams.roomSize = baseRoomSize * 0.6f;
+             reverbParams.wetLevel = 0.6f;
+             break;
+
+        case 16: // Scorpion Tail (Scorpio) - High density, filter feedback
+             reverbParams.roomSize = baseRoomSize * 0.7f;
+             highPassFilter.setCutoffFrequency(currentEqLow * 2.0f); // Filter in loop approximation
+             break;
+
+        case 17: // Balance Scale (Libra) - Lush balanced modulation
+             reverbParams.roomSize = 0.9f;
+             chorus.setRate(currentModRate * 1.5f); // Faster mod
+             chorus.setDepth(0.7f);
+             break;
+
+        case 18: // Lion Heart (Leo) - Very slow attack, super long
+             reverbParams.roomSize = 0.99f;
+             reverbParams.damping = 0.05f; // Super long tail
+             break;
+
+        case 19: // Maiden (Virgo) - Complex echoes
+             reverbParams.roomSize = baseRoomSize * 0.5f;
+             delayLine.setDelay(currentDelay * sampleRate / 1000.0f * 0.8f); // Tighter echoes
+             break;
+
+        case 20: // Seven Sisters (Pleiades) - Transparent
+             reverbParams.roomSize = baseRoomSize * 0.8f;
+             reverbParams.width = 1.0f; // Wide
+             reverbParams.damping = 0.5f; // Neutral
+             chorus.setMix(0.2f); // Subtle mod
              break;
 
         default:
