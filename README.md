@@ -1,4 +1,4 @@
-# VST3 Open Valhalla
+# Open Valhalla
 
 An open-source, modular reverb engine offering high-fidelity algorithms inspired by classic space reverberators. Features deep modulation, multiple reverb modes, and VST3 compatibility.
 
@@ -52,4 +52,4 @@ This project is open-source. JUCE is used under the GPLv3/Commercial license (ch
 
 ## Credits
 
-This is an educational recreation and tribute, not a 1:1 clone of any specific product.
+This is an educational recreation and tribute.

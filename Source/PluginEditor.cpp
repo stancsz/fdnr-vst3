@@ -46,10 +46,14 @@ void VST3OpenValhallaAudioProcessorEditor::addSlider(juce::Slider& slider, std::
     slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
     addAndMakeVisible(slider);
 
-    // Use a label? Or just rely on lookandfeel?
-    // For now, I'll just add the slider. The image has labels separate.
-    // I'll paint the labels in paint() for simplicity or add Label components.
-    // The attachment
+    auto label = std::make_unique<juce::Label>();
+    label->setText(name, juce::dontSendNotification);
+    label->setJustificationType(juce::Justification::centred);
+    label->setColour(juce::Label::textColourId, juce::Colours::white);
+    label->attachToComponent(&slider, false); // Attached above the slider
+    addAndMakeVisible(*label);
+    labels.push_back(std::move(label));
+
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), paramID, slider);
 }
 
@@ -61,7 +65,7 @@ void VST3OpenValhallaAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (24.0f);
-    g.drawFittedText ("VST3 Open Valhalla", getLocalBounds().removeFromTop(40), juce::Justification::left, 1);
+    g.drawFittedText ("Open Valhalla", getLocalBounds().removeFromTop(40), juce::Justification::left, 1);
 
     // Draw Group Boxes
     g.setColour (juce::Colour(0xFF202040));
