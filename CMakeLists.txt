@@ -24,7 +24,7 @@ juce_add_plugin(VST3OpenValhalla
     PLUGIN_MANUFACTURER_CODE Juce
     PLUGIN_CODE VstO
     FORMATS VST3 Standalone
-    PRODUCT_NAME "VST3 Open Valhalla"
+    PRODUCT_NAME "Open Valhalla"
 )
 
 target_sources(VST3OpenValhalla
