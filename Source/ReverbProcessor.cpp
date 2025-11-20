@@ -111,6 +111,8 @@ void ReverbProcessor::process(juce::dsp::ProcessContextReplacing<float>& context
 
     // Reset defaults
     chorus.setMix(0.5f);
+    reverbParams.wetLevel = 1.0f;
+    reverbParams.dryLevel = 0.0f;
 
     switch (currentMode) {
         case 0: // Gemini: Fast attack, short decay, high density
@@ -234,8 +236,6 @@ void ReverbProcessor::process(juce::dsp::ProcessContextReplacing<float>& context
     }
 
     reverbParams.width = baseWidth;
-    if(reverbParams.wetLevel == 0.33f) reverbParams.wetLevel = 1.0f; // Ensure we are 100% wet in the parallel path unless modified
-    reverbParams.dryLevel = 0.0f;
 
     reverb.setParameters(reverbParams);
     reverb.process(wetContext);
