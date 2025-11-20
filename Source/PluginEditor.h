@@ -75,6 +75,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> modRateAtt, modDepthAtt;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> eqHighAtt, eqLowAtt;
 
+    // Labels
+    std::vector<std::unique_ptr<juce::Label>> labels;
+
     // Mode Selector
     juce::ComboBox modeComboBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modeAtt;
