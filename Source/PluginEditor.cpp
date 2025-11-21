@@ -108,6 +108,12 @@ VST3OpenValhallaAudioProcessorEditor::VST3OpenValhallaAudioProcessorEditor (VST3
         });
     };
 
+    // Website Link
+    addAndMakeVisible(websiteLink);
+    websiteLink.setButtonText("ov.stanchen.ca");
+    websiteLink.setURL(juce::URL("https://ov.stanchen.ca"));
+    websiteLink.setColour(juce::HyperlinkButton::textColourId, juce::Colour(0xFF888888));
+
     setSize (850, 450);
 }
 
@@ -184,6 +190,9 @@ void VST3OpenValhallaAudioProcessorEditor::resized()
     // Preset Buttons
     savePresetButton.setBounds(clearButton.getRight() + 10, modeComboBox.getY(), 60, 30);
     loadPresetButton.setBounds(savePresetButton.getRight() + 10, modeComboBox.getY(), 60, 30);
+
+    // Website Link
+    websiteLink.setBounds(bottomBar.getRight() - 110, modeComboBox.getY(), 100, 30);
 
     // Main panels layout
     // 5 Columns: Mix | Delay | Feedback | Mod | EQ

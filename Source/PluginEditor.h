@@ -145,5 +145,8 @@ private:
     juce::TextButton loadPresetButton { "LOAD" };
     std::unique_ptr<juce::FileChooser> fileChooser;
 
+    // Website Link
+    juce::HyperlinkButton websiteLink;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST3OpenValhallaAudioProcessorEditor)
 };
