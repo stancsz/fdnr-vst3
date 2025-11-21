@@ -274,108 +274,77 @@ void VST3OpenValhallaAudioProcessor::setStateInformation (const void* data, int 
             apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
-void VST3OpenValhallaAudioProcessor::resetAllParametersToDefault()
+void VST3OpenValhallaAudioProcessor::savePreset(const juce::File& file)
 {
-    // Resets all parameters to their default values
-    for (auto* param : getParameters())
+    auto state = apvts.copyState();
+
+    // Convert ValueTree to JSON object manually to ensure simple format
+    juce::DynamicObject* jsonObject = new juce::DynamicObject();
+
+    // A robust way is to get all parameters from APVTS directly
+    juce::DynamicObject* paramsObject = new juce::DynamicObject();
+
+    auto& params = getParameters();
+    for (auto* param : params)
     {
-        if (auto* p = dynamic_cast<juce::AudioProcessorParameter*>(param))
+        if (auto* p = dynamic_cast<juce::AudioProcessorParameterWithID*>(param))
         {
-            // Skip the MODE parameter if we don't want to reset it on Clear
-            // But usually "Clear" clears audio, maybe not settings.
-            // However, the user said "knobs ... didn't change" when Clear is clicked.
-            // This implies they expect them to change.
-            // If I reset MODE, it jumps back to Twin Star. That might be annoying.
-            // I will skip MODE.
+            paramsObject->setProperty(p->paramID, p->getValue()); // Normalized value 0..1
+            // OR we can save the denormalized value?
+            // Users usually want to see "Mix: 50.0", not "0.5".
+            // Let's save the raw denormalized value if possible.
+            // p->getValue() returns normalized.
+            // APVTS getRawParameterValue returns the actual float value.
 
-            // Checking if the parameter is "MODE"
-            // The parameterID might be prefixed.
-            // apvts parameters usually have the ID we gave them.
-
-            // Actually, getParameters() returns AudioProcessorParameter*.
-            // We can check name or rely on order, but ID is safer.
-            // But AudioProcessorParameter doesn't always expose ID easily without casting to AudioProcessorParameterWithID.
-
-            if (auto* pid = dynamic_cast<juce::AudioProcessorParameterWithID*>(p))
-            {
-                if (pid->paramID == "MODE") continue;
-            }
-
-            p->setValueNotifyingHost(p->getDefaultValue());
+            // Save denormalized value
+            paramsObject->setProperty(p->paramID, apvts.getRawParameterValue(p->paramID)->load());
         }
     }
+
+    jsonObject->setProperty("parameters", paramsObject);
+    jsonObject->setProperty("pluginVersion", JucePlugin_VersionString);
+    jsonObject->setProperty("pluginName", JucePlugin_Name);
+
+    juce::var jsonVar(jsonObject);
+    juce::String jsonString = juce::JSON::toString(jsonVar);
+
+    file.replaceWithText(jsonString);
 }
 
-void VST3OpenValhallaAudioProcessor::setParametersForMode(int modeIndex)
+void VST3OpenValhallaAudioProcessor::loadPreset(const juce::File& file)
 {
-    // Sets parameters to "sensible defaults" for the selected mode.
-    // Since we don't have a definitive list, we will map a few known characteristics
-    // and default the rest.
+    if (!file.existsAsFile())
+        return;
 
-    // Helper to set parameter by ID
-    auto setParam = [&](juce::String id, float value) {
-        if (auto* p = apvts.getParameter(id))
-        {
-             // setValueNotifyingHost expects normalized 0-1
-             p->setValueNotifyingHost(p->getNormalisableRange().convertTo0to1(value));
-        }
-    };
+    juce::String jsonString = file.loadFileAsString();
+    juce::var jsonVar = juce::JSON::parse(jsonString);
 
-    // Default starting point for all modes
-    setParam("MIX", 50.0f);
-    setParam("WIDTH", 100.0f);
-    setParam("DELAY", 300.0f);
-    setParam("WARP", 0.0f);
-    setParam("FEEDBACK", 50.0f);
-    setParam("DENSITY", 50.0f); // Default middle density
-    setParam("MODRATE", 0.5f);
-    setParam("MODDEPTH", 50.0f);
-    setParam("EQHIGH", 8000.0f);
-    setParam("EQLOW", 200.0f);
+    if (juce::JSON::toString(jsonVar) == "null") // Failed parse
+        return;
 
-    switch (modeIndex)
+    if (jsonVar.hasProperty("parameters"))
     {
-        case 0: // Twin Star (Gemini)
-            setParam("DELAY", 100.0f);
-            setParam("FEEDBACK", 40.0f);
-            break;
+        auto* paramsObject = jsonVar.getProperty("parameters", juce::var()).getDynamicObject();
+        if (paramsObject)
+        {
+            auto& properties = paramsObject->getProperties();
+            for (auto& prop : properties)
+            {
+                 auto paramID = prop.name.toString();
+                 auto value = (float)prop.value;
 
-        case 1: // Sea Serpent (Hydra)
-            setParam("DELAY", 200.0f);
-            setParam("MODDEPTH", 70.0f); // More modulation
-            break;
-
-        case 2: // Horse Man (Centaurus)
-            setParam("FEEDBACK", 60.0f);
-            break;
-
-        case 3: // Archer (Sagittarius)
-             setParam("DELAY", 500.0f);
-             setParam("DENSITY", 20.0f);
-             break;
-
-        case 4: // Void Maker (Great Annihilator)
-             setParam("DELAY", 600.0f);
-             setParam("FEEDBACK", 85.0f); // Long decay
-             setParam("DENSITY", 80.0f);
-             break;
-
-        case 5: // Galaxy Spiral (Andromeda)
-             setParam("DELAY", 800.0f);
-             setParam("MODRATE", 0.2f);
-             break;
-
-        case 10: // Cloud Major
-             setParam("WARP", 40.0f);
-             break;
-
-        case 14: // Water Bearer (EchoVerb)
-             setParam("MIX", 40.0f);
-             setParam("DELAY", 400.0f);
-             setParam("FEEDBACK", 30.0f);
-             break;
-
-        // Add more as needed, or stick to defaults.
+                 auto* param = apvts.getParameter(paramID);
+                 if (param)
+                 {
+                     // Use RangedAudioParameter to support all parameter types generically
+                     if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(param))
+                     {
+                         float normalized = rangedParam->convertTo0to1(value);
+                         rangedParam->setValueNotifyingHost(normalized);
+                     }
+                 }
+            }
+        }
     }
 }
 
