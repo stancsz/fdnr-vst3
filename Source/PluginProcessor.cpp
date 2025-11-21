@@ -53,13 +53,21 @@ juce::AudioProcessorValueTreeState::ParameterLayout VST3OpenValhallaAudioProcess
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "MODDEPTH", "Mod Depth", juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f), 50.0f));
 
-    // EQ High
+    // Dynamic EQ
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "EQHIGH", "EQ High", juce::NormalisableRange<float>(1000.0f, 20000.0f, 1.0f, 0.3f), 5000.0f));
+        "DYNFREQ", "Dyn Freq", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.3f), 1000.0f));
 
-    // EQ Low
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "EQLOW", "EQ Low", juce::NormalisableRange<float>(10.0f, 1000.0f, 1.0f, 0.3f), 200.0f));
+        "DYNQ", "Dyn Q", juce::NormalisableRange<float>(0.1f, 10.0f, 0.01f), 1.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "DYNGAIN", "Dyn Gain", juce::NormalisableRange<float>(-18.0f, 18.0f, 0.1f), 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "DYNDEPTH", "Dyn Depth", juce::NormalisableRange<float>(-18.0f, 18.0f, 0.1f), 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "DYNTHRESH", "Dyn Thresh", juce::NormalisableRange<float>(-60.0f, 0.0f, 0.1f), -20.0f));
 
     // Ducking
     layout.add(std::make_unique<juce::AudioParameterFloat>(
@@ -222,14 +230,17 @@ void VST3OpenValhallaAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     auto density = apvts.getRawParameterValue("DENSITY")->load();
     auto modRate = apvts.getRawParameterValue("MODRATE")->load();
     auto modDepth = apvts.getRawParameterValue("MODDEPTH")->load();
-    auto eqHigh = apvts.getRawParameterValue("EQHIGH")->load();
-    auto eqLow = apvts.getRawParameterValue("EQLOW")->load();
+    auto dynFreq = apvts.getRawParameterValue("DYNFREQ")->load();
+    auto dynQ = apvts.getRawParameterValue("DYNQ")->load();
+    auto dynGain = apvts.getRawParameterValue("DYNGAIN")->load();
+    auto dynDepth = apvts.getRawParameterValue("DYNDEPTH")->load();
+    auto dynThresh = apvts.getRawParameterValue("DYNTHRESH")->load();
     auto ducking = apvts.getRawParameterValue("DUCKING")->load();
     auto mode = static_cast<int>(apvts.getRawParameterValue("MODE")->load());
 
     reverbProcessor.setParameters(
         mix, width, delay, warp, feedback, density,
-        modRate, modDepth, eqHigh, eqLow, ducking, mode
+        modRate, modDepth, dynFreq, dynQ, dynGain, dynDepth, dynThresh, ducking, mode
     );
 
     juce::dsp::AudioBlock<float> block(buffer);
@@ -381,8 +392,11 @@ void VST3OpenValhallaAudioProcessor::resetAllParametersToDefault()
     if (auto* p = apvts.getParameter("DENSITY")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
     if (auto* p = apvts.getParameter("MODRATE")) p->setValueNotifyingHost(p->convertTo0to1(0.5f));
     if (auto* p = apvts.getParameter("MODDEPTH")) p->setValueNotifyingHost(p->convertTo0to1(50.0f));
-    if (auto* p = apvts.getParameter("EQHIGH")) p->setValueNotifyingHost(p->convertTo0to1(5000.0f));
-    if (auto* p = apvts.getParameter("EQLOW")) p->setValueNotifyingHost(p->convertTo0to1(200.0f));
+    if (auto* p = apvts.getParameter("DYNFREQ")) p->setValueNotifyingHost(p->convertTo0to1(1000.0f));
+    if (auto* p = apvts.getParameter("DYNQ")) p->setValueNotifyingHost(p->convertTo0to1(1.0f));
+    if (auto* p = apvts.getParameter("DYNGAIN")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
+    if (auto* p = apvts.getParameter("DYNDEPTH")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
+    if (auto* p = apvts.getParameter("DYNTHRESH")) p->setValueNotifyingHost(p->convertTo0to1(-20.0f));
     if (auto* p = apvts.getParameter("DUCKING")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
 }
 
