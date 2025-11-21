@@ -10,6 +10,8 @@ VST3OpenValhallaAudioProcessorEditor::VST3OpenValhallaAudioProcessorEditor (VST3
     addSlider(mixSlider, mixAtt, "MIX", "MIX");
     addSlider(widthSlider, widthAtt, "WIDTH", "WIDTH");
 
+    addSlider(duckingSlider, duckingAtt, "DUCKING", "DUCKING");
+
     addSlider(delaySlider, delayAtt, "DELAY", "DELAY");
     addSlider(warpSlider, warpAtt, "WARP", "WARP");
 
@@ -19,10 +21,12 @@ VST3OpenValhallaAudioProcessorEditor::VST3OpenValhallaAudioProcessorEditor (VST3
     addSlider(modRateSlider, modRateAtt, "MODRATE", "MOD RATE");
     addSlider(modDepthSlider, modDepthAtt, "MODDEPTH", "MOD DEPTH");
 
-    addSlider(eqHighSlider, eqHighAtt, "EQHIGH", "EQ HIGH");
-    addSlider(eqLowSlider, eqLowAtt, "EQLOW", "EQ LOW");
-
-    addSlider(duckingSlider, duckingAtt, "DUCKING", "DUCKING");
+    // Dynamic EQ
+    addSlider(dynFreqSlider, dynFreqAtt, "DYNFREQ", "DYN FREQ");
+    addSlider(dynQSlider, dynQAtt, "DYNQ", "DYN Q");
+    addSlider(dynGainSlider, dynGainAtt, "DYNGAIN", "DYN GAIN");
+    addSlider(dynDepthSlider, dynDepthAtt, "DYNDEPTH", "DYN DEPTH");
+    addSlider(dynThreshSlider, dynThreshAtt, "DYNTHRESH", "DYN THRESH");
 
     // Mode
     addAndMakeVisible(modeComboBox);
@@ -49,19 +53,6 @@ VST3OpenValhallaAudioProcessorEditor::VST3OpenValhallaAudioProcessorEditor (VST3
 
     modeComboBox.onChange = [this]()
     {
-        // When user changes mode via UI, update defaults
-        // Note: onChange is called when the combo box item is selected.
-        // The attachment might also trigger parameter change.
-        // We want to update AFTER the parameter is set, or just forcefully set parameters.
-        // Since setParametersForMode updates parameters via APVTS, it will update the UI sliders too.
-
-        // However, ComboBoxAttachment syncs the parameter with the ComboBox.
-        // If we change other parameters here, it should be fine.
-
-        // Issue: onChange might be called before the parameter is updated by the attachment?
-        // Actually, attachment listens to the parameter and updates the box, AND listens to the box and updates the parameter.
-        // If we rely on the box index:
-
         audioProcessor.setParametersForMode(modeComboBox.getSelectedId() - 1);
     };
 
@@ -140,8 +131,11 @@ void VST3OpenValhallaAudioProcessorEditor::addSlider(juce::Slider& slider, std::
     else if (paramID == "DENSITY") slider.setTooltip("Adjusts diffusion density.");
     else if (paramID == "MODRATE") slider.setTooltip("LFO speed.");
     else if (paramID == "MODDEPTH") slider.setTooltip("LFO intensity.");
-    else if (paramID == "EQHIGH") slider.setTooltip("High-cut filter.");
-    else if (paramID == "EQLOW") slider.setTooltip("Low-cut filter.");
+    else if (paramID == "DYNFREQ") slider.setTooltip("Dynamic EQ Frequency.");
+    else if (paramID == "DYNQ") slider.setTooltip("Dynamic EQ Bandwidth (Q).");
+    else if (paramID == "DYNGAIN") slider.setTooltip("Dynamic EQ Static Gain.");
+    else if (paramID == "DYNDEPTH") slider.setTooltip("Dynamic EQ Modulation Depth.");
+    else if (paramID == "DYNTHRESH") slider.setTooltip("Dynamic EQ Threshold.");
     else if (paramID == "DUCKING") slider.setTooltip("Compresses reverb when input is loud.");
 
     addAndMakeVisible(slider);
@@ -170,21 +164,6 @@ void VST3OpenValhallaAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (juce::Font("Futura", 28.0f, juce::Font::bold));
     g.drawFittedText ("OPEN VALHALLA", getLocalBounds().removeFromTop(50), juce::Justification::centred, 1);
-
-    // Draw Group Panels
-    auto drawPanel = [&](juce::Rectangle<int> bounds, juce::String title)
-    {
-        g.setColour(juce::Colour(0xFF252535).withAlpha(0.6f));
-        g.fillRoundedRectangle(bounds.toFloat(), 10.0f);
-        g.setColour(juce::Colour(0xFF353545));
-        g.drawRoundedRectangle(bounds.toFloat(), 10.0f, 1.0f);
-
-        // Subtle Label at bottom of panel? Or maybe not needed if knobs are labeled.
-    };
-
-    // We need the layout coordinates here, which is tricky without recalculating.
-    // A better way is to use a component for groups, but for now we approximate or store rects.
-    // Or we can just draw 'separation' lines.
 }
 
 void VST3OpenValhallaAudioProcessorEditor::resized()
@@ -211,33 +190,38 @@ void VST3OpenValhallaAudioProcessorEditor::resized()
     // Website Link
     websiteLink.setBounds(bottomBar.getRight() - 110, modeComboBox.getY(), 100, 30);
 
-    // Main panels layout
-    // 5 Columns: Mix | Delay | Feedback | Mod | EQ
-
+    // 5 Columns, 3 Rows
     int margin = 10;
-    int cols = 6;
+    int cols = 5;
     int colWidth = (area.getWidth() - (margin * (cols - 1))) / cols;
 
     auto getCol = [&](int index) -> juce::Rectangle<int> {
         return area.withWidth(colWidth).translated(index * (colWidth + margin), 0);
     };
 
-    // Helper to layout 2 knobs in a column
-    auto layoutColumn = [&](int colIndex, juce::Slider& top, juce::Slider& bottom) {
+    // Layout helper for 3 rows
+    auto layoutColumn3 = [&](int colIndex, juce::Slider& row1, juce::Slider& row2, juce::Slider* row3) {
         auto col = getCol(colIndex);
-        int knobHeight = (col.getHeight() - 20) / 2;
-        top.setBounds(col.removeFromTop(knobHeight).reduced(10));
-        bottom.setBounds(col.reduced(10));
+        int knobHeight = (col.getHeight() - 20) / 3;
+
+        row1.setBounds(col.removeFromTop(knobHeight).reduced(5)); // Smaller padding
+        row2.setBounds(col.removeFromTop(knobHeight).reduced(5));
+        if (row3)
+            row3->setBounds(col.reduced(5));
     };
 
-    layoutColumn(0, mixSlider, widthSlider);
-    layoutColumn(1, delaySlider, warpSlider);
-    layoutColumn(2, feedbackSlider, densitySlider);
-    layoutColumn(3, modRateSlider, modDepthSlider);
-    layoutColumn(4, eqHighSlider, eqLowSlider);
+    // Col 1: Mix, Width, Ducking
+    layoutColumn3(0, mixSlider, widthSlider, &duckingSlider);
 
-    // Column 5: Ducking (Top)
-    auto col5 = getCol(5);
-    int knobHeight = (col5.getHeight() - 20) / 2;
-    duckingSlider.setBounds(col5.removeFromTop(knobHeight).reduced(10));
+    // Col 2: Delay, Warp, Feedback
+    layoutColumn3(1, delaySlider, warpSlider, &feedbackSlider);
+
+    // Col 3: Density, ModRate, ModDepth
+    layoutColumn3(2, densitySlider, modRateSlider, &modDepthSlider);
+
+    // Col 4: DynFreq, DynQ, DynGain
+    layoutColumn3(3, dynFreqSlider, dynQSlider, &dynGainSlider);
+
+    // Col 5: DynDepth, DynThresh
+    layoutColumn3(4, dynDepthSlider, dynThreshSlider, nullptr);
 }
