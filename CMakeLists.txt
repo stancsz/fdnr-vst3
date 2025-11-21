@@ -103,4 +103,4 @@ target_compile_definitions(ScreenshotTest
 
 target_compile_features(ScreenshotTest PRIVATE cxx_std_17)
 
-add_test(NAME GenerateScreenshot COMMAND ScreenshotTest)
+add_test(NAME GenerateScreenshot COMMAND ScreenshotTest WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

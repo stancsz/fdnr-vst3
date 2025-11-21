@@ -46,7 +46,7 @@ public:
         
         // Create test directory if it doesn't exist
         juce::File cwd = juce::File::getCurrentWorkingDirectory();
-        juce::File testDir = cwd.getChildFile("test");
+        juce::File testDir = cwd.getChildFile("TestOutput");
         
         if (!testDir.exists())
         {
@@ -61,6 +61,9 @@ public:
         }
             
         juce::File screenshotFile = testDir.getChildFile("screenshot.png");
+        
+        if (screenshotFile.exists())
+            screenshotFile.deleteFile();
         
         juce::PNGImageFormat png;
         juce::FileOutputStream stream(screenshotFile);
