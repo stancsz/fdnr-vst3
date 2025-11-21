@@ -38,13 +38,23 @@ An open-source, modular reverb engine offering high-fidelity algorithms inspired
 
 ### Building
 
+#### Linux
 ```bash
-cmake -B build -S .
-cmake --build build
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
 ```
 
-The VST3 plugin will be located in `build/VST3OpenValhalla_artefacts/VST3/`.
-The Standalone application will be in `build/VST3OpenValhalla_artefacts/Standalone/`.
+#### Windows
+```cmd
+cmake -B build -S .
+cmake --build build --config Release
+```
+
+The VST3 plugin will be located in `build/VST3OpenValhalla_artefacts/VST3/` (Linux) or `build/VST3OpenValhalla_artefacts/Release/VST3/` (Windows).
+The Standalone application will be in `build/VST3OpenValhalla_artefacts/Standalone/` (Linux) or `build/VST3OpenValhalla_artefacts/Release/Standalone/` (Windows).
+
+### Automated Builds (CI)
+This project uses GitHub Actions to automatically build releases for Windows and Linux. You can download the latest artifacts from the [Actions](https://github.com/YOUR_USERNAME/REPO_NAME/actions) tab (replace with actual repo URL) or from the Releases page if available.
 
 ## License
 
