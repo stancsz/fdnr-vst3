@@ -354,3 +354,47 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new VST3OpenValhallaAudioProcessor();
 }
+void VST3OpenValhallaAudioProcessor::resetAllParametersToDefault()
+{
+    // Defaults based on createParameterLayout
+    // Mix: 50.0
+    // Width: 100.0
+    // Delay: 100.0
+    // Warp: 0.0
+    // Feedback: 50.0
+    // Density: 0.0
+    // Mod Rate: 0.5
+    // Mod Depth: 50.0
+    // EQ High: 5000.0
+    // EQ Low: 200.0
+
+    if (auto* p = apvts.getParameter("MIX")) p->setValueNotifyingHost(p->convertTo0to1(50.0f));
+    if (auto* p = apvts.getParameter("WIDTH")) p->setValueNotifyingHost(p->convertTo0to1(100.0f));
+    if (auto* p = apvts.getParameter("DELAY")) p->setValueNotifyingHost(p->convertTo0to1(100.0f));
+    if (auto* p = apvts.getParameter("WARP")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
+    if (auto* p = apvts.getParameter("FEEDBACK")) p->setValueNotifyingHost(p->convertTo0to1(50.0f));
+    if (auto* p = apvts.getParameter("DENSITY")) p->setValueNotifyingHost(p->convertTo0to1(0.0f));
+    if (auto* p = apvts.getParameter("MODRATE")) p->setValueNotifyingHost(p->convertTo0to1(0.5f));
+    if (auto* p = apvts.getParameter("MODDEPTH")) p->setValueNotifyingHost(p->convertTo0to1(50.0f));
+    if (auto* p = apvts.getParameter("EQHIGH")) p->setValueNotifyingHost(p->convertTo0to1(5000.0f));
+    if (auto* p = apvts.getParameter("EQLOW")) p->setValueNotifyingHost(p->convertTo0to1(200.0f));
+}
+
+void VST3OpenValhallaAudioProcessor::setParametersForMode(int modeIndex)
+{
+    // For now, we will just define this function to fix the linker error.
+    // In a full implementation, this would switch case on modeIndex and set defaults.
+    // Since we don't have the specific values for each of the 21 modes, we leave it as a placeholder
+    // or just ensure it doesn't crash.
+
+    // Example structure (commented out):
+    /*
+    switch (modeIndex)
+    {
+        case TwinStar: // Gemini
+            // Set specific defaults...
+            break;
+        // ...
+    }
+    */
+}
