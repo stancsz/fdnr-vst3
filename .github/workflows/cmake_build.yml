@@ -1,0 +1,56 @@
+name: CMake Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake -B build -S .
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Archive Production Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenValhalla-Windows
+        path: |
+          build/VST3OpenValhalla_artefacts/Release/VST3/
+          build/VST3OpenValhalla_artefacts/Release/Standalone/
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev
+
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Archive Production Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenValhalla-Linux
+        path: |
+          build/VST3OpenValhalla_artefacts/VST3/
+          build/VST3OpenValhalla_artefacts/Standalone/
