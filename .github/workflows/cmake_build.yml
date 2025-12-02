@@ -59,19 +59,66 @@ jobs:
     - name: Package Windows
       run: |
         mkdir package_win
-        if (Test-Path "build/VST3OpenValhalla_artefacts/Release/VST3") {
-          Copy-Item -Path "build/VST3OpenValhalla_artefacts/Release/VST3" -Destination "package_win" -Recurse
+        if (Test-Path "build/FDNR_artefacts/Release/VST3") {
+          Copy-Item -Path "build/FDNR_artefacts/Release/VST3" -Destination "package_win" -Recurse
+        } elseif (Test-Path "build/FDNR_artefacts/VST3") {
+          Copy-Item -Path "build/FDNR_artefacts/VST3" -Destination "package_win" -Recurse
         }
-        if (Test-Path "build/VST3OpenValhalla_artefacts/Release/Standalone") {
-          Copy-Item -Path "build/VST3OpenValhalla_artefacts/Release/Standalone" -Destination "package_win" -Recurse
+        
+        if (Test-Path "build/FDNR_artefacts/Release/Standalone") {
+          Copy-Item -Path "build/FDNR_artefacts/Release/Standalone" -Destination "package_win" -Recurse
+        } elseif (Test-Path "build/FDNR_artefacts/Standalone") {
+          Copy-Item -Path "build/FDNR_artefacts/Standalone" -Destination "package_win" -Recurse
         }
-        Compress-Archive -Path "package_win/*" -DestinationPath "Open_Valhalla_VST3_Windows.zip"
+        
+        Compress-Archive -Path "package_win/*" -DestinationPath "FDNR_VST3_Windows.zip"
 
     - name: Upload Windows Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Open_Valhalla_VST3_Windows
-        path: Open_Valhalla_VST3_Windows.zip
+        name: FDNR_VST3_Windows
+        path: FDNR_VST3_Windows.zip
+
+  build-mac:
+    name: Build Mac
+    needs: bump-version
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.bump-version.outputs.commit_sha }}
+
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Package Mac
+      run: |
+        mkdir package_mac
+        if [ -d "build/FDNR_artefacts/Release/VST3" ]; then
+            cp -r "build/FDNR_artefacts/Release/VST3" package_mac/
+        elif [ -d "build/FDNR_artefacts/VST3" ]; then
+            cp -r "build/FDNR_artefacts/VST3" package_mac/
+        fi
+        
+        if [ -d "build/FDNR_artefacts/Release/Standalone" ]; then
+            cp -r "build/FDNR_artefacts/Release/Standalone" package_mac/
+        elif [ -d "build/FDNR_artefacts/Standalone" ]; then
+            cp -r "build/FDNR_artefacts/Standalone" package_mac/
+        fi
+        
+        cd package_mac
+        zip -r ../FDNR_VST3_Mac.zip .
+        cd ..
+
+    - name: Upload Mac Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FDNR_VST3_Mac
+        path: FDNR_VST3_Mac.zip
 
   build-linux:
     name: Build Linux
@@ -97,21 +144,31 @@ jobs:
     - name: Package Linux
       run: |
         mkdir package_linux
-        cp -r build/VST3OpenValhalla_artefacts/VST3 package_linux/
-        cp -r build/VST3OpenValhalla_artefacts/Standalone package_linux/
+        if [ -d "build/FDNR_artefacts/Release/VST3" ]; then
+            cp -r "build/FDNR_artefacts/Release/VST3" package_linux/
+        elif [ -d "build/FDNR_artefacts/VST3" ]; then
+            cp -r "build/FDNR_artefacts/VST3" package_linux/
+        fi
+        
+        if [ -d "build/FDNR_artefacts/Release/Standalone" ]; then
+            cp -r "build/FDNR_artefacts/Release/Standalone" package_linux/
+        elif [ -d "build/FDNR_artefacts/Standalone" ]; then
+            cp -r "build/FDNR_artefacts/Standalone" package_linux/
+        fi
+        
         cd package_linux
-        zip -r ../Open_Valhalla_VST3_Linux.zip .
+        zip -r ../FDNR_VST3_Linux.zip .
         cd ..
 
     - name: Upload Linux Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Open_Valhalla_VST3_Linux
-        path: Open_Valhalla_VST3_Linux.zip
+        name: FDNR_VST3_Linux
+        path: FDNR_VST3_Linux.zip
 
   release:
     name: Create Release
-    needs: [bump-version, build-windows, build-linux]
+    needs: [bump-version, build-windows, build-mac, build-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -124,13 +181,19 @@ jobs:
     - name: Download Windows Artifact
       uses: actions/download-artifact@v4
       with:
-        name: Open_Valhalla_VST3_Windows
+        name: FDNR_VST3_Windows
+        path: .
+
+    - name: Download Mac Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: FDNR_VST3_Mac
         path: .
 
     - name: Download Linux Artifact
       uses: actions/download-artifact@v4
       with:
-        name: Open_Valhalla_VST3_Linux
+        name: FDNR_VST3_Linux
         path: .
 
     - name: Commit Artifacts to Repo
@@ -144,8 +207,9 @@ jobs:
         git pull origin main --rebase
 
         mkdir -p release
-        mv Open_Valhalla_VST3_Windows.zip release/
-        mv Open_Valhalla_VST3_Linux.zip release/
+        mv FDNR_VST3_Windows.zip release/
+        mv FDNR_VST3_Mac.zip release/
+        mv FDNR_VST3_Linux.zip release/
 
         git add release/
         git commit -m "Add release artifacts for version ${{ needs.bump-version.outputs.new_version }} [skip ci]"
@@ -160,5 +224,6 @@ jobs:
         name: Release v${{ needs.bump-version.outputs.new_version }}
         target_commitish: ${{ steps.commit_artifacts.outputs.sha }}
         files: |
-          release/Open_Valhalla_VST3_Windows.zip
-          release/Open_Valhalla_VST3_Linux.zip
+          release/FDNR_VST3_Windows.zip
+          release/FDNR_VST3_Mac.zip
+          release/FDNR_VST3_Linux.zip
