@@ -1,6 +1,6 @@
 # FND Reverb
 
-[![Download v0.2.1](https://img.shields.io/badge/Download-v0.2.1-brightgreen?style=for-the-badge)](https://github.com/stancsz/fdnr-vst3/releases/tag/v0.2.1)
+[![Download](https://img.shields.io/badge/Download-Latest-brightgreen?style=for-the-badge)](https://github.com/stancsz/fdnr-vst3/releases)
 
 ![FDNR Screenshot](screenshot.png)
 
