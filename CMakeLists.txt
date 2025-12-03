@@ -49,6 +49,7 @@ target_compile_definitions(FDNR
 if(UNIX AND NOT APPLE)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(ALSA REQUIRED alsa)
+    pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 endif()
 
 target_link_libraries(FDNR
@@ -60,6 +61,7 @@ target_link_libraries(FDNR
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
+        PkgConfig::GTK
 )
 
 enable_testing()
@@ -89,6 +91,7 @@ target_link_libraries(ScreenshotTest
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
+        PkgConfig::GTK
 )
 
 target_compile_definitions(ScreenshotTest
