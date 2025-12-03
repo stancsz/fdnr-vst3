@@ -61,7 +61,6 @@ target_link_libraries(FDNR
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
-        PkgConfig::GTK
 )
 
 enable_testing()
@@ -91,7 +90,6 @@ target_link_libraries(ScreenshotTest
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
-        PkgConfig::GTK
 )
 
 target_compile_definitions(ScreenshotTest
@@ -107,3 +105,8 @@ target_compile_definitions(ScreenshotTest
 target_compile_features(ScreenshotTest PRIVATE cxx_std_17)
 
 add_test(NAME GenerateScreenshot COMMAND ScreenshotTest WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(FDNR PUBLIC PkgConfig::GTK)
+    target_link_libraries(ScreenshotTest PUBLIC PkgConfig::GTK)
+endif()
