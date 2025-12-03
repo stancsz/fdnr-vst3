@@ -6,37 +6,6 @@
 
 <a href="https://www.buymeacoffee.com/stancsz" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
-## Release v0.2.1 — FND Reverb by Stancsz Audio
-```
-### Branding Update
-- **New Name**: FND Reverb (Feedback Delay Network Reverb)
-- **Company**: Stancsz Audio
-- **Manufacturer Code**: NAPT
-
-### UI Improvements
-- Modern ComboBox and PopupMenu styling with dark theme and cyan accents
-- Reduced button heights by 50% for cleaner, more compact layout
-- Improved title sizing and spacing with better visual hierarchy
-- Removed website link from interface for cleaner design
-```
-
-## Release v0.2.0 — FDNR v2.0
-```
-### 21 New Modes
-Explore a universe of sound with 21 unique algorithms, including:
-
-- **Void Maker** — Massive, infinite drones.
-- **Galaxy Spiral** — Lush, swirling modulation.
-- **Harp String** — Resonant, metallic textures.
-- **Twin Star** — Balanced, all-purpose hall.
-
-### New Features
-- **Deep Shaping** — Control Warp, Density, Diffusion, and Saturation.
-- **Dynamics** — Built-in Ducking and Gating for cleaner mixes.
-- **EQ** — Integrated 3-Band and Dynamic EQ.
-- **Workflow** — Resizable UI, A/B switching, and JSON preset management.
-```
-
 **FND Reverb** is an open-source, modular reverb engine by **Stancsz Audio** offering high-fidelity algorithms inspired by classic space reverberators. It features deep modulation, multiple reverb modes, and VST3 compatibility.
 
 ## Features
@@ -46,9 +15,11 @@ Explore a universe of sound with 21 unique algorithms, including:
     *   **Pre-Delay**: Up to 2000ms with modulation.
     *   **Warp**: Controls the modulation feedback and character.
     *   **Reverb Core**: Feedback Delay Network (FDN) based reverb with feedback and density controls.
-    *   **EQ**: Low and High cut filters to shape the tone.
+    *   **EQ**: Integrated 3-Band and Dynamic EQ with Low/High cut filters.
+*   **Dynamics**: Built-in Ducking and Gating for cleaner mixes.
 *   **Deep Modulation**: Adjustable Rate and Depth for chorus-like textures or pitch-shifting tails.
-*   **Custom UI**: Dark, flat design inspired by classic hardware and software units.
+*   **Workflow**: Resizable UI, A/B switching, and JSON preset management.
+*   **Custom UI**: Modern dark theme with cyan accents, inspired by classic hardware.
 
 ## Controls
 
@@ -79,7 +50,7 @@ Explore a universe of sound with 21 unique algorithms, including:
 ## Installation
 
 ### For Users
-Download the latest Release for your operating system (Windows, Mac, or Linux) from the [Releases](../../releases) page, or use the download badge above which links to the current Windows release.
+Download the latest Release for your operating system (Windows or Mac) from the [Releases](../../releases) page, or use the download badge above which links to the current Windows release.
 
 1.  **Unzip** the downloaded `.zip` file (e.g., `FDNR_VST3_Windows.zip`).
 2.  **VST3 Plugin**:
@@ -87,7 +58,6 @@ Download the latest Release for your operating system (Windows, Mac, or Linux) f
     *   Copy it to your system's VST3 directory:
         *   **Windows**: `C:\Program Files\Common Files\VST3\`
         *   **Mac**: `/Library/Audio/Plug-Ins/VST3/`
-        *   **Linux**: `~/.vst3/` or `/usr/lib/vst3/` (or your DAW's VST3 folder)
 3.  **Standalone Application** (Optional):
     *   Find the `FDNR` executable (or app bundle).
     *   You can run this directly or copy it to your Applications folder.
@@ -95,7 +65,7 @@ Download the latest Release for your operating system (Windows, Mac, or Linux) f
 If the plugin doesn't appear in your host
 - Confirm the `.vst3` file is in a folder the DAW scans.
 - Rescan or restart the host application.
-- Check file permissions (macOS/Linux) and architecture (x64 vs arm64) compatibility.
+- Check file permissions (macOS) and architecture (x64 vs arm64) compatibility.
 - See `release/` for prebuilt zips.
 
 ### For Developers
@@ -106,15 +76,10 @@ See the [Build Instructions](#build-instructions) below.
 ### Prerequisites
 *   **CMake** (3.15 or higher)
 *   **C++ Compiler** with C++17 support (MSVC, Clang, GCC)
-*   **Linux Dependencies**:
-    ```bash
-    sudo apt-get install libwebkit2gtk-4.1-dev libasound2-dev libx11-dev libfreetype6-dev libcurl4-openssl-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev
-    ```
-    *(Note: On some systems `libwebkit2gtk-4.0-dev` may be required instead.)*
 
 ### Building
 
-#### Linux / macOS
+#### macOS
 ```bash
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
@@ -127,7 +92,7 @@ cmake --build build --config Release
 ```
 
 The compiled VST3 plugin will be located in:
-*   `build/FDNR_artefacts/Release/VST3/` (Windows/Linux)
+*   `build/FDNR_artefacts/Release/VST3/` (Windows)
 *   *Or* `build/FDNR_artefacts/VST3/` (depending on CMake generator)
 
 The Standalone application will be in:
