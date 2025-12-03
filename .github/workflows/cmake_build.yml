@@ -120,55 +120,11 @@ jobs:
         name: FDNR_VST3_Mac
         path: FDNR_VST3_Mac.zip
 
-  build-linux:
-    name: Build Linux
-    needs: bump-version
-    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ needs.bump-version.outputs.commit_sha }}
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev libgtk-3-dev
-
-    - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --config Release
-
-    - name: Package Linux
-      run: |
-        mkdir package_linux
-        if [ -d "build/FDNR_artefacts/Release/VST3" ]; then
-            cp -r "build/FDNR_artefacts/Release/VST3" package_linux/
-        elif [ -d "build/FDNR_artefacts/VST3" ]; then
-            cp -r "build/FDNR_artefacts/VST3" package_linux/
-        fi
-        
-        if [ -d "build/FDNR_artefacts/Release/Standalone" ]; then
-            cp -r "build/FDNR_artefacts/Release/Standalone" package_linux/
-        elif [ -d "build/FDNR_artefacts/Standalone" ]; then
-            cp -r "build/FDNR_artefacts/Standalone" package_linux/
-        fi
-        
-        cd package_linux
-        zip -r ../FDNR_VST3_Linux.zip .
-        cd ..
-
-    - name: Upload Linux Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: FDNR_VST3_Linux
-        path: FDNR_VST3_Linux.zip
 
   release:
     name: Create Release
-    needs: [bump-version, build-windows, build-mac, build-linux]
+    needs: [bump-version, build-windows, build-mac]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -190,11 +146,7 @@ jobs:
         name: FDNR_VST3_Mac
         path: .
 
-    - name: Download Linux Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: FDNR_VST3_Linux
-        path: .
+
 
     - name: Commit Artifacts to Repo
       id: commit_artifacts
@@ -209,7 +161,7 @@ jobs:
         mkdir -p release
         mv FDNR_VST3_Windows.zip release/
         mv FDNR_VST3_Mac.zip release/
-        mv FDNR_VST3_Linux.zip release/
+
 
         git add release/
         git commit -m "Add release artifacts for version ${{ needs.bump-version.outputs.new_version }} [skip ci]"
@@ -226,4 +178,4 @@ jobs:
         files: |
           release/FDNR_VST3_Windows.zip
           release/FDNR_VST3_Mac.zip
-          release/FDNR_VST3_Linux.zip
+
