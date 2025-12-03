@@ -8,7 +8,7 @@ if(NOT TARGET juce::juce_audio_utils)
     FetchContent_Declare(
         juce
         GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-        GIT_TAG        7.0.12
+        GIT_TAG        8.0.4
     )
     FetchContent_MakeAvailable(juce)
 endif()

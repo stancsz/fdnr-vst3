@@ -133,7 +133,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev
+        sudo apt-get install -y libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev libgtk-3-dev
 
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
